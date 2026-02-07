@@ -1,25 +1,23 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>My Extension</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        padding: 10px;
-        width: 200px;
-      }
-      button {
-        padding: 8px;
-        width: 100%;
-      }
-    </style>
-  </head>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 12px;
+      width: 220px;
+    }
+    .score {
+      font-size: 28px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h3>Circadian Stimulus</h3>
+  <div class="score" id="cs">--</div>
+  <div id="label"></div>
 
-  <body>
-    <h3>Hello 👋</h3>
-    <button id="clickMe">Click me</button>
-
-    <script src="popup.js"></script>
-  </body>
+  <script src="popup.js"></script>
+</body>
 </html>

@@ -8,9 +8,16 @@
     "default_popup": "popup.html"
   },
 
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"]
+    }
+  ],
+
   "background": {
     "service_worker": "background.js"
   },
 
-  "permissions": []
+  "permissions": ["activeTab"]
 }
