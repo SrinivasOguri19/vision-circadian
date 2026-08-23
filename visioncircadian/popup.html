@@ -189,8 +189,13 @@
     }
     /* Right-column tooltips open leftward to avoid clipping */
     .tip.tip-r::after { left: auto; right: -8px; }
-    /* Bottom-of-popup tooltips open upward to avoid clipping */
-    .tip.tip-up::after { top: auto; bottom: calc(100% + 7px); }
+    /* Bottom-of-popup tooltips open upward, centered on the icon */
+    .tip.tip-up::after {
+      top: auto;
+      bottom: calc(100% + 7px);
+      left: 50%;
+      transform: translateX(-50%);
+    }
     .tip:hover::after { opacity: 1; }
 
     /* ── Color classes ── */
@@ -281,7 +286,7 @@
   <div class="time-strip">
     <span class="time-strip-label">
       Time Weight
-      <span class="tip tip-up tip-r"
+      <span class="tip tip-up"
         data-tip="Biological sensitivity multiplier for the current hour. Morning ×1.0 · Afternoon ×0.6 · Evening ×1.3 · Night ×1.6. Screen light is most disruptive after sunset.">?</span>
     </span>
     <span class="time-strip-value" id="timeWeightValue">--</span>
