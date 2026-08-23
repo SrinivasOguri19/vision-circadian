@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VisionCircadian — Privacy Policy</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f9fafb;
+      color: #1f2937;
+      line-height: 1.7;
+    }
+
+    header {
+      background: #0f1117;
+      color: #e8eaf0;
+      padding: 32px 24px;
+    }
+
+    header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    header p {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    main {
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 0 24px 60px;
+    }
+
+    h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111827;
+      margin: 32px 0 10px;
+    }
+
+    p {
+      font-size: 15px;
+      color: #374151;
+      margin-bottom: 12px;
+    }
+
+    ul {
+      margin: 8px 0 12px 20px;
+      font-size: 15px;
+      color: #374151;
+    }
+
+    ul li {
+      margin-bottom: 6px;
+    }
+
+    .highlight {
+      background: #ecfdf5;
+      border-left: 3px solid #2ecc71;
+      padding: 12px 16px;
+      border-radius: 4px;
+      font-size: 15px;
+      color: #065f46;
+      margin: 20px 0;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 13px;
+      color: #9ca3af;
+      padding: 24px;
+      border-top: 1px solid #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>VisionCircadian</h1>
+    <p>Privacy Policy &mdash; Version 1.1.0</p>
+  </header>
+
+  <main>
+
+    <p><strong>Effective date:</strong> August 23, 2026</p>
+
+    <div class="highlight">
+      VisionCircadian does not collect, store, or transmit any personal data.
+      All processing happens entirely on your device.
+    </div>
+
+    <h2>What the Extension Does</h2>
+    <p>
+      VisionCircadian is a Chrome extension that estimates the circadian stimulus (CS)
+      of the webpage you are currently viewing. It reads the colors of visible elements
+      on screen, computes a photobiological score using established lighting science
+      (CIE S 026:2018), and displays the result in the extension popup and toolbar badge.
+    </p>
+
+    <h2>Data We Do Not Collect</h2>
+    <ul>
+      <li>No personal information (name, email, account details)</li>
+      <li>No browsing history or URLs visited</li>
+      <li>No page content, text, or images</li>
+      <li>No usage analytics or telemetry</li>
+      <li>No cookies or persistent identifiers</li>
+    </ul>
+
+    <h2>How Color Data Is Used</h2>
+    <p>
+      The extension reads the computed CSS background and text colors of visible DOM
+      elements on the active tab. This color data is used exclusively to calculate
+      the circadian stimulus score. It is processed in memory, never written to disk,
+      and never sent anywhere outside your browser.
+    </p>
+
+    <h2>Permissions Explained</h2>
+    <ul>
+      <li>
+        <strong>activeTab</strong> &mdash; allows the extension to read color information
+        from the page you are currently viewing, only while the extension is active.
+      </li>
+      <li>
+        <strong>scripting</strong> &mdash; used to inject a small content script that
+        samples element colors and applies the optional screen tint overlay.
+      </li>
+      <li>
+        <strong>tabs</strong> &mdash; used to detect tab switches so each tab maintains
+        its own independent exposure record.
+      </li>
+    </ul>
+
+    <h2>Third-Party Services</h2>
+    <p>
+      VisionCircadian does not use any third-party services, APIs, or analytics
+      platforms. No data leaves your device.
+    </p>
+
+    <h2>Children's Privacy</h2>
+    <p>
+      This extension does not knowingly collect any information from anyone,
+      including children under the age of 13.
+    </p>
+
+    <h2>Changes to This Policy</h2>
+    <p>
+      If this policy changes in a future version, the updated policy will be
+      published at this URL and the effective date above will be updated.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Questions about this privacy policy can be sent to
+      <a href="mailto:voguri@asu.edu">voguri@asu.edu</a>.
+    </p>
+
+  </main>
+
+  <footer>
+    &copy; 2026 VisionCircadian &mdash; All rights reserved.
+  </footer>
+
+</body>
+</html>
