@@ -7,95 +7,76 @@ function srgbToLinear(c) {
     : Math.pow((c + 0.055) / 1.055, 2.4);
 }
 
-// Approx melanopic weighting
-function melanopicLuxFromRGB(r, g, b) {
-  const R = srgbToLinear(r);
-  const G = srgbToLinear(g);
-  const B = srgbToLinear(b);
-
-  return (
-    0.001 * R +
-    0.018 * G +
-    0.981 * B
-  );
+// sRGB linear → CIE XYZ (D65 white point, IEC 61966-2-1 matrix)
+function srgbLinearToXYZ(R, G, B) {
+  return {
+    X: 0.4124564 * R + 0.3575761 * G + 0.1804375 * B,
+    Y: 0.2126729 * R + 0.7151522 * G + 0.0721750 * B,
+    Z: 0.0193339 * R + 0.1191920 * G + 0.9503041 * B,
+  };
 }
 
-// Logistic CS function
-function claToCS(CLA) {
-  const k = 1.1;
-  const x0 = 2.0;
-
-  return 0.75 / (1 + Math.exp(-k * (Math.log10(CLA + 1) - x0)));
+// McCamy (1992): CIE xy chromaticity → CCT (valid ~2500–20000 K)
+function xyzToCCT(X, Y, Z) {
+  const s = X + Y + Z;
+  if (s < 1e-6) return null;
+  const x = X / s;
+  const y = Y / s;
+  const n = (x - 0.3320) / (y - 0.1858);
+  const CCT = -449 * n * n * n + 3525 * n * n - 6823.3 * n + 5520.33;
+  return CCT >= 1000 && CCT <= 20000 ? Math.round(CCT) : null;
 }
 
-// MAIN API (global)
-function computeCSFromColors(colors) {
-  let melanopicSum = 0;
-
-  colors.forEach(rgb => {
-    const [r, g, b] = rgb.match(/\d+/g).map(Number);
-    melanopicSum += melanopicLuxFromRGB(r, g, b);
-  });
-
-  const avgMelanopic = melanopicSum / colors.length;
-
-  const CLA = avgMelanopic * 300; // screen luminance scaling
-  const CS = claToCS(CLA);
-
-  return { CLA, CS };
+// Melanopic lux from linearized sRGB.
+// Coefficients: CIE S 026:2018 melanopic efficiency function integrated
+// against standard sRGB primaries (D65). ipRGC peak ≈ 490 nm — blue-dominant.
+function melanopicLuxFromLinear(R, G, B) {
+  return 0.0016 * R + 0.0274 * G + 0.9710 * B;
 }
 
+// Duration + CLA based CS (Rea et al. model)
+function calculateDurationAdjustedCS(CLA, exposureMinutes) {
+  const t = exposureMinutes / 60;
+  const E = t * CLA;
+  return 0.7 * (1 - 1 / (1 + Math.pow(E / 355.7, 1.1026)));
+}
+
+// Returns { CLA, CCT }
+// CCT: area-weighted correlated color temperature of visible screen content.
 function computeCSFromColorAreas(colorAreas) {
   let melanopicSum = 0;
-  let totalArea = 0;
+  let totalArea    = 0;
+  let Xsum = 0, Ysum = 0, Zsum = 0;
 
   colorAreas.forEach(({ rgb, area }) => {
     const [r, g, b] = rgb;
-    const melanopic = melanopicLuxFromRGB(r, g, b);
+    const R = srgbToLinear(r);
+    const G = srgbToLinear(g);
+    const B = srgbToLinear(b);
 
-    melanopicSum += melanopic * area;
-    totalArea += area;
+    melanopicSum += melanopicLuxFromLinear(R, G, B) * area;
+    totalArea    += area;
+
+    const { X, Y, Z } = srgbLinearToXYZ(R, G, B);
+    Xsum += X * area;
+    Ysum += Y * area;
+    Zsum += Z * area;
   });
 
-  if (totalArea === 0) return { CLA: 0, CS: 0 };
+  if (totalArea === 0) return { CLA: 0, CCT: null };
 
-  const avgMelanopic = melanopicSum / totalArea;
+  const CLA = (melanopicSum / totalArea) * 300;
+  const CCT = xyzToCCT(Xsum, Ysum, Zsum);
 
-  const CLA = avgMelanopic * 300; // screen luminance scaling
-  const CS = claToCS(CLA);
-
-  return { CLA, CS };
+  return { CLA, CCT };
 }
 
-function computeCSFromPixels(pixels) {
-  let melanopicSum = 0;
-
-  pixels.forEach(([r, g, b]) => {
-    melanopicSum += melanopicLuxFromRGB(r, g, b);
-  });
-  if (pixels.length === 0) return { CLA: 0, CS: 0 };
-
-
-  const avgMelanopic = melanopicSum / pixels.length;
-
-  const CLA = avgMelanopic * 300;
-
-  return {
-    CLA,
-    CS: claToCS(CLA)
-  };
-}
 function applyCircadianTimeWeight(cs) {
-
   const hour = new Date().getHours();
-
-  // Biological sensitivity model
   let weight;
-
-  if (hour >= 6 && hour < 12) weight = 1.0;      // morning
-  else if (hour >= 12 && hour < 17) weight = 0.6; // afternoon
-  else if (hour >= 17 && hour < 21) weight = 1.3; // evening
-  else weight = 1.6;                              // night
-
+  if      (hour >= 6  && hour < 12) weight = 1.0;
+  else if (hour >= 12 && hour < 17) weight = 0.6;
+  else if (hour >= 17 && hour < 21) weight = 1.3;
+  else                               weight = 1.6;
   return Math.min(cs * weight, 0.75);
 }
