@@ -44,3 +44,58 @@ function computeCSFromColors(colors) {
 
   return { CLA, CS };
 }
+
+function computeCSFromColorAreas(colorAreas) {
+  let melanopicSum = 0;
+  let totalArea = 0;
+
+  colorAreas.forEach(({ rgb, area }) => {
+    const [r, g, b] = rgb;
+    const melanopic = melanopicLuxFromRGB(r, g, b);
+
+    melanopicSum += melanopic * area;
+    totalArea += area;
+  });
+
+  if (totalArea === 0) return { CLA: 0, CS: 0 };
+
+  const avgMelanopic = melanopicSum / totalArea;
+
+  const CLA = avgMelanopic * 300; // screen luminance scaling
+  const CS = claToCS(CLA);
+
+  return { CLA, CS };
+}
+
+function computeCSFromPixels(pixels) {
+  let melanopicSum = 0;
+
+  pixels.forEach(([r, g, b]) => {
+    melanopicSum += melanopicLuxFromRGB(r, g, b);
+  });
+  if (pixels.length === 0) return { CLA: 0, CS: 0 };
+
+
+  const avgMelanopic = melanopicSum / pixels.length;
+
+  const CLA = avgMelanopic * 300;
+
+  return {
+    CLA,
+    CS: claToCS(CLA)
+  };
+}
+function applyCircadianTimeWeight(cs) {
+
+  const hour = new Date().getHours();
+
+  // Biological sensitivity model
+  let weight;
+
+  if (hour >= 6 && hour < 12) weight = 1.0;      // morning
+  else if (hour >= 12 && hour < 17) weight = 0.6; // afternoon
+  else if (hour >= 17 && hour < 21) weight = 1.3; // evening
+  else weight = 1.6;                              // night
+
+  return Math.min(cs * weight, 0.75);
+}
